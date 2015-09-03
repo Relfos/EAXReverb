@@ -1,0 +1,33 @@
+# depslib dependency file v1.0
+1441258529 source:d:\code\eax_emu\eaxsoft\main.cpp
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<stdint.h>
+	<string.h>
+	"ReverbEffect.h"
+
+1441258424 d:\code\eax_emu\eaxsoft\include\reverbeffect.h
+	<stdint.h>
+
+1441258936 source:d:\code\eax_emu\eaxsoft\src\reverbeffect.cpp
+	"ReverbEffect.h"
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<stddef.h>
+	<string.h>
+
+1441258936 source:d:\code\eaxreverb\src\reverbeffect.cpp
+	"ReverbEffect.h"
+	<math.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<stddef.h>
+	<string.h>
+
+1441258424 d:\code\eaxreverb\include\reverbeffect.h
+	<stdint.h>
+
