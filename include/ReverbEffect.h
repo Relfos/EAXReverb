@@ -114,7 +114,7 @@ typedef enum FilterType {
     /** EFX-style low-pass filter, specifying a gain and reference frequency. */
     Filter_HighShelf,
     /** EFX-style high-pass filter, specifying a gain and reference frequency. */
-    Filter_LowShelf,
+    FilterType_LowShelf,
 } FilterType;
 
 typedef struct

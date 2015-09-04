@@ -82,7 +82,7 @@ int main()
 
     do {
 
-        int workSamples = REVERB_BUFFERSIZE / OUTPUT_CHANNELS;
+        int workSamples = REVERB_BUFFERSIZE / 4;
         if (workSamples>sampleCount)
         {
             workSamples = sampleCount;
