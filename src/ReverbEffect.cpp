@@ -124,7 +124,7 @@ void FilterState_clear(FilterState *filter)
     filter->y[1] = 0.0f;
 }
 
-void FilterState_setParams(FilterState *filter, ALfilterType type, float gain, float freq_mult, float bandwidth)
+void FilterState_setParams(FilterState *filter, FilterType type, float gain, float freq_mult, float bandwidth)
 {
     float alpha;
     float w0;
@@ -137,7 +137,7 @@ void FilterState_setParams(FilterState *filter, ALfilterType type, float gain, f
     /* Calculate filter coefficients depending on filter type */
     switch(type)
     {
-        case ALfilterType_HighShelf:
+        case Filter_HighShelf:
             alpha = sinf(w0)/2.0f*sqrtf((gain + 1.0f/gain)*(1.0f/0.75f - 1.0f) + 2.0f);
             filter->b[0] =       gain*((gain+1.0f) + (gain-1.0f)*cosf(w0) + 2.0f*sqrtf(gain)*alpha);
             filter->b[1] = -2.0f*gain*((gain-1.0f) + (gain+1.0f)*cosf(w0)                         );
@@ -146,7 +146,7 @@ void FilterState_setParams(FilterState *filter, ALfilterType type, float gain, f
             filter->a[1] =  2.0f*     ((gain-1.0f) - (gain+1.0f)*cosf(w0)                         );
             filter->a[2] =             (gain+1.0f) - (gain-1.0f)*cosf(w0) - 2.0f*sqrtf(gain)*alpha;
             break;
-        case ALfilterType_LowShelf:
+        case Filter_LowShelf:
             alpha = sinf(w0)/2.0f*sqrtf((gain + 1.0f/gain)*(1.0f/0.75f - 1.0f) + 2.0f);
             filter->b[0] =       gain*((gain+1.0f) - (gain-1.0f)*cosf(w0) + 2.0f*sqrtf(gain)*alpha);
             filter->b[1] =  2.0f*gain*((gain-1.0f) - (gain+1.0f)*cosf(w0)                         );
@@ -238,8 +238,7 @@ static inline float AllpassInOut(DelayLine *Delay, uint32_t outOffset, uint32_t 
     return (coeff * out) - feed;
 }
 
-// Given an input sample, this function produces modulation for the late
-// reverb.
+// Given an input sample, this function produces modulation for the late reverb.
 inline float ReverbEffect::EAXModulation(float in)
 {
     float sinus, frac;
@@ -282,8 +281,7 @@ inline float ReverbEffect::EarlyDelayLineOut(uint32_t index)
     return AttenuatedDelayLineOut(&this->Early.Delay[index], this->Offset - this->Early.Offset[index], this->Early.Coeff[index]);
 }
 
-// Given an input sample, this function produces four-channel output for the
-// early reflections.
+// Given an input sample, this function produces four-channel output for the  early reflections.
 inline void ReverbEffect::EarlyReflection(float in, float *out)
 {
     float d[4], v, f[4];
@@ -454,45 +452,6 @@ inline void ReverbEffect::EAXEcho(float in, float *late)
 }
 
 
-// Perform the non-EAX reverb pass on a given input sample, resulting in
-// four-channel output.
-inline void ReverbEffect::VerbPass(float in, float *out)
-{
-    float feed, late[4], taps[4];
-
-    // Filter the incoming sample.
-    in = FilterState_Process(&this->LpFilter, in);
-
-    // Feed the initial delay line.
-    DelayLineIn(&this->Delay, this->Offset, in);
-
-    // Calculate the early reflection from the first delay tap.
-    in = DelayLineOut(&this->Delay, this->Offset - this->DelayTap[0]);
-    this->EarlyReflection(in, out);
-
-    // Feed the decorrelator from the energy-attenuated output of the second
-    // delay tap.
-    in = DelayLineOut(&this->Delay, this->Offset - this->DelayTap[1]);
-    feed = in * this->Late.DensityGain;
-    DelayLineIn(&this->Decorrelator, this->Offset, feed);
-
-    // Calculate the late reverb from the decorrelator taps.
-    taps[0] = feed;
-    taps[1] = DelayLineOut(&this->Decorrelator, this->Offset - this->DecoTap[0]);
-    taps[2] = DelayLineOut(&this->Decorrelator, this->Offset - this->DecoTap[1]);
-    taps[3] = DelayLineOut(&this->Decorrelator, this->Offset - this->DecoTap[2]);
-    this->LateReverb(taps, late);
-
-    // Mix early reflections and late reverb.
-    out[0] += late[0];
-    out[1] += late[1];
-    out[2] += late[2];
-    out[3] += late[3];
-
-    // Step all delays forward one sample.
-    this->Offset++;
-}
-
 // Perform the EAX reverb pass on a given input sample, resulting in four-channel output.
 inline void ReverbEffect::EAXVerbPass(float in, float *early, float *late)
 {
@@ -650,15 +609,13 @@ void ReverbEffect::AllocLines(uint32_t frequency)
         this->SampleBuffer[index] = 0.0f;
 }
 
-// Calculate a decay coefficient given the length of each cycle and the time
-// until the decay reaches -60 dB.
+// Calculate a decay coefficient given the length of each cycle and the time until the decay reaches -60 dB.
 static inline float CalcDecayCoeff(float length, float decayTime)
 {
     return powf(0.001f/*-60 dB*/, length/decayTime);
 }
 
-// Calculate a decay length from a coefficient and the time until the decay
-// reaches -60 dB.
+// Calculate a decay length from a coefficient and the time until the decay reaches -60 dB.
 static inline float CalcDecayLength(float coeff, float decayTime)
 {
     return log10f(coeff) * decayTime / log10f(0.001f)/*-60 dB*/;
@@ -699,8 +656,7 @@ static inline void CalcMatrixCoeffs(float diffusion, float *x, float *y)
     *y = sinf(t) / n;
 }
 
-// Calculate the limited HF ratio for use with the late reverb low-pass
-// filters.
+// Calculate the limited HF ratio for use with the late reverb low-pass filters.
 static float CalcLimitedHfRatio(float hfRatio, float airAbsorptionGainHF, float decayTime)
 {
     float limitRatio;
@@ -717,8 +673,7 @@ static float CalcLimitedHfRatio(float hfRatio, float airAbsorptionGainHF, float 
     return clampf(limitRatio, 0.1f, hfRatio);
 }
 
-// Calculate the coefficient for a HF (and eventually LF) decay damping
-// filter.
+// Calculate the coefficient for a HF (and eventually LF) decay damping filter.
 static inline float CalcDampingCoeff(float hfRatio, float length, float decayTime, float decayCoeff, float cw)
 {
     float coeff, g;
@@ -750,9 +705,9 @@ static inline float CalcDampingCoeff(float hfRatio, float length, float decayTim
     return coeff;
 }
 
-// Update the EAX modulation index, range, and depth.  Keep in mind that this
-// kind of vibrato is additive and not multiplicative as one may expect.  The
-// downswing will sound stronger than the upswing.
+// Update the EAX modulation index, range, and depth.
+// Keep in mind that this kind of vibrato is additive and not multiplicative as one may expect.
+// The downswing will sound stronger than the upswing.
 void ReverbEffect::UpdateModulator(float modTime, float modDepth, uint32_t frequency)
 {
     uint32_t range;
@@ -975,10 +930,10 @@ void ReverbEffect::Update(int frequency)
 
     // Calculate the master low-pass filter (from the master effect HF gain).
     hfscale = this->settings.HFReference / frequency;
-    FilterState_setParams(&this->LpFilter, ALfilterType_HighShelf, this->settings.GainHF, hfscale, 0.0f);
+    FilterState_setParams(&this->LpFilter, Filter_HighShelf, this->settings.GainHF, hfscale, 0.0f);
 
     lfscale = this->settings.LFReference / frequency;
-    FilterState_setParams(&this->HpFilter, ALfilterType_LowShelf, this->settings.GainLF, lfscale, 0.0f);
+    FilterState_setParams(&this->HpFilter, Filter_LowShelf, this->settings.GainLF, lfscale, 0.0f);
 
     // Update the modulator line.
     this->UpdateModulator(this->settings.ModulationTime, this->settings.ModulationDepth, frequency);

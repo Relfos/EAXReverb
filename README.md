@@ -1,7 +1,7 @@
 EAXReverb
 ============
 
-_EAXReverb_ implements a audio environment reverb effect DSP (EAX/EFX) in C++.
+_EAXReverb_ implements a audio environment reverb effect DSP (EAX/EFX) in C++.  
 This code was based in the OpenALsoft C implementation of the EAX reverb algorithm.
 
 A sample project is included:

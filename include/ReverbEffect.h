@@ -110,12 +110,12 @@
 #define EAXREVERB_MAX_DECAY_HFLIMIT           TRUE
 #define EAXREVERB_DEFAULT_DECAY_HFLIMIT       TRUE
 
-typedef enum ALfilterType {
+typedef enum FilterType {
     /** EFX-style low-pass filter, specifying a gain and reference frequency. */
-    ALfilterType_HighShelf,
+    Filter_HighShelf,
     /** EFX-style high-pass filter, specifying a gain and reference frequency. */
-    ALfilterType_LowShelf,
-} ALfilterType;
+    Filter_LowShelf,
+} FilterType;
 
 typedef struct
 {
@@ -324,8 +324,6 @@ class ReverbEffect
 
     inline void EAXEcho(float in, float *late);
     inline void EAXVerbPass(float in, float *early, float *late);
-
-    inline void VerbPass(float in, float *out);
 
     void UpdateDelayLine(float earlyDelay, float lateDelay, uint32_t frequency);
     void UpdateModulator(float modTime, float modDepth, uint32_t frequency);

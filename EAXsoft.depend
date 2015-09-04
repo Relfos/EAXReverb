@@ -19,7 +19,7 @@
 	<stddef.h>
 	<string.h>
 
-1441258936 source:d:\code\eaxreverb\src\reverbeffect.cpp
+1441366989 source:d:\code\eaxreverb\src\reverbeffect.cpp
 	"ReverbEffect.h"
 	<math.h>
 	<stdio.h>
@@ -28,6 +28,14 @@
 	<stddef.h>
 	<string.h>
 
-1441258424 d:\code\eaxreverb\include\reverbeffect.h
+1441367040 d:\code\eaxreverb\include\reverbeffect.h
 	<stdint.h>
+
+1441259241 source:d:\code\eaxreverb\src\main.cpp
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<stdint.h>
+	<string.h>
+	"ReverbEffect.h"
 
